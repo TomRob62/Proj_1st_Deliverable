@@ -1,0 +1,68 @@
+int     line 1 Cols  1 - 3  is  T_Int 
+factorial     line 1 Cols  5 - 13  is  T_IDENTIFIER 
+(     line 1 Cols  14 - 14  is  '(' 
+int     line 1 Cols  15 - 17  is  T_Int 
+n     line 1 Cols  19 - 19  is  T_IDENTIFIER 
+)     line 1 Cols  20 - 20  is  ')' 
+{     line 2 Cols  1 - 1  is  '{' 
+if     line 3 Cols  3 - 4  is  T_If 
+(     line 3 Cols  6 - 6  is  '(' 
+n     line 3 Cols  7 - 7  is  T_IDENTIFIER 
+<=     line 3 Cols  9 - 10  is  T_LessEqual 
+1     line 3 Cols  11 - 11  is  T_IntConstant (value= 1)
+)     line 3 Cols  13 - 13  is  ')' 
+return     line 3 Cols  15 - 20  is  T_Return 
+1     line 3 Cols  22 - 22  is  T_IntConstant (value= 1)
+;     line 3 Cols  23 - 23  is  ';' 
+return     line 4 Cols  3 - 8  is  T_Return 
+n     line 4 Cols  10 - 10  is  T_IDENTIFIER 
+*     line 4 Cols  11 - 11  is  '*' 
+factorial     line 4 Cols  12 - 20  is  T_IDENTIFIER 
+(     line 4 Cols  21 - 21  is  '(' 
+n     line 4 Cols  22 - 22  is  T_IDENTIFIER 
+-     line 4 Cols  23 - 23  is  '-' 
+1     line 4 Cols  24 - 24  is  T_IntConstant (value= 1)
+)     line 4 Cols  25 - 25  is  ')' 
+;     line 4 Cols  26 - 26  is  ';' 
+}     line 5 Cols  1 - 1  is  '}' 
+void     line 7 Cols  1 - 4  is  T_Void 
+main     line 7 Cols  6 - 9  is  T_IDENTIFIER 
+(     line 7 Cols  10 - 10  is  '(' 
+)     line 7 Cols  11 - 11  is  ')' 
+{     line 8 Cols  1 - 1  is  '{' 
+int     line 9 Cols  4 - 6  is  T_Int 
+n     line 9 Cols  8 - 8  is  T_IDENTIFIER 
+;     line 9 Cols  9 - 9  is  ';' 
+for     line 10 Cols  4 - 6  is  T_For 
+(     line 10 Cols  8 - 8  is  '(' 
+n     line 10 Cols  9 - 9  is  T_IDENTIFIER 
+=     line 10 Cols  11 - 11  is  '=' 
+1     line 10 Cols  13 - 13  is  T_IntConstant (value= 1)
+;     line 10 Cols  14 - 14  is  ';' 
+n     line 10 Cols  16 - 16  is  T_IDENTIFIER 
+<=     line 10 Cols  18 - 19  is  T_LessEqual 
+15     line 10 Cols  21 - 22  is  T_IntConstant (value= 15)
+;     line 10 Cols  23 - 23  is  ';' 
+n     line 10 Cols  25 - 25  is  T_IDENTIFIER 
+=     line 10 Cols  27 - 27  is  '=' 
+n     line 10 Cols  29 - 29  is  T_IDENTIFIER 
++     line 10 Cols  31 - 31  is  '+' 
+1     line 10 Cols  33 - 33  is  T_IntConstant (value= 1)
+)     line 10 Cols  34 - 34  is  ')' 
+Print     line 11 Cols  7 - 11  is  T_Print 
+(     line 11 Cols  12 - 12  is  '(' 
+"Factorial("     line 11 Cols  13 - 24  is  T_STRINGCONSTANT (value= "Factorial(")
+,     line 11 Cols  25 - 25  is  ',' 
+n     line 11 Cols  27 - 27  is  T_IDENTIFIER 
+,     line 11 Cols  29 - 29  is  ',' 
+") = "     line 11 Cols  31 - 36  is  T_STRINGCONSTANT (value= ") = ")
+,     line 11 Cols  37 - 37  is  ',' 
+factorial     line 11 Cols  39 - 47  is  T_IDENTIFIER 
+(     line 11 Cols  48 - 48  is  '(' 
+n     line 11 Cols  49 - 49  is  T_IDENTIFIER 
+)     line 11 Cols  50 - 50  is  ')' 
+,     line 11 Cols  51 - 51  is  ',' 
+"\n"     line 11 Cols  53 - 56  is  T_STRINGCONSTANT (value= "\n")
+)     line 11 Cols  57 - 57  is  ')' 
+;     line 11 Cols  58 - 58  is  ';' 
+}     line 12 Cols  1 - 1  is  '}' 
