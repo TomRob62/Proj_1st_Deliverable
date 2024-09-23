@@ -2,7 +2,12 @@
 # Dr. S. Islam
 # CS 4308 (02) - Concepts of Programming Language
 # September 22, 2024
+"""
+File Description: This file is a python program that scans a decaf program and
+prints the tokens for that program.
 
+Run this program in a terminal and pass the decaf program as a command line parameter.
+"""
 import sys
 
 class Scanner:
@@ -12,7 +17,12 @@ class Scanner:
     Functions
     ---------
     __init__(file)
+    add_char()
+    get_char()
+    get_non_blank()
     lookup(find_char)
+    peak()
+    lex()
     """
     # global variables
     char_classes = ('LETTER', 'DIGIT', 'UNKNOWN', 'EOF')
@@ -24,6 +34,8 @@ class Scanner:
     line_num = 0
     current_line = ""
     file = []
+
+    # look-up tables
     operators = ('+','-','*','/','(', ')', '{', '}','[',']',';','=',',','!', )
     token_name = ('T_AND', 'T_ASSIGN' ,'T_BOOLTYPE', 'T_BREAK', 'T_CHARCONSTANT',
                   'T_COMMA', 'T_COMMENT', 'T_CONTINUE', 'T_DIV', 'T_DOT','T_ELSE', 
@@ -123,17 +135,27 @@ class Scanner:
     def peak(self, char1) -> bool:
         """
         Helper method that determines if a possible combination of 
-        unknown characters could form a known token
+        unknown characters could form a known token. 
+
+        Parameters
+        -----------
+        char1 - first part of a string for lexical analysis
         """
-        if self.col_num < len(self.current_line):
+        if self.col_num < len(self.current_line): # checking next char is within index
             test_char = char1 + self.current_line[self.col_num-1]
         else:
             test_char = ""
         result = self.lookup(test_char)
-        return not result == 'NOTFOUND'
+        return not result == 'NOTFOUND' # return true if a known token exists
     # end peak()
 
     def lex(self) -> None:
+        """
+        This function acts as a lexical analyzer. It will determine if the nextchar is a digit, letter, or unknow
+        and process the lexeme to match it with known tokens.
+
+        This function will then print the lexeme and token information 
+        """
         self.lexeme = ""
         self.get_non_blank()
 
