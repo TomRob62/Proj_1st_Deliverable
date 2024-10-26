@@ -197,11 +197,8 @@ class Scanner:
                     self.add_char()
                     self.get_char()
                     current_token = self.lookup(self.lexeme)
-                if self.operators.__contains__(self.lexeme):
-                    self.token_class = "\'%s\'" % self.lexeme
         else: # CASE 4 EOF
             self.lexeme = "EOF0"
-        
         print("%s     line %s Cols  %s - %s  is  %s" % (self.lexeme, 
                                                   self.line_num+1, 
                                                   (self.col_num-len(self.lexeme)), 
