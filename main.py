@@ -20,7 +20,7 @@ def main() -> None:
     # end of try/except
 
     parse = My_Parser(scan_obj)
-    parse.scan_only()
+    parse.main()
 # end of main()
 
 if __name__ == '__main__':
