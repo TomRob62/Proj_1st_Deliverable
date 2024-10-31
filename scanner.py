@@ -178,7 +178,7 @@ class Scanner:
             while self.next_char_class == 1:
                 self.add_char()
                 self.get_char()
-            self.token_class = 'T_INTCONSTANT (value= %s)' % self.lexeme
+            self.token_class = 'T_INTCONSTANT' 
         elif self.next_char_class == 2: # CASE 3 UNKNOWN
             if self.next_char == '"' or self.next_char == '\'': # Checks for string constants
                 conditional = True
@@ -188,7 +188,7 @@ class Scanner:
                     conditional = not (self.next_char == '"' or self.next_char == '\'')
                 self.add_char()
                 self.get_char()
-                self.token_class = 'T_STRINGCONSTANT (value= %s)' % self.lexeme
+                self.token_class = 'T_STRINGCONSTANT'
             else: # not a string constant
                 self.add_char()
                 self.get_char()
@@ -210,6 +210,28 @@ class Scanner:
                             self.token_class))
     # end of lex()
 
+    def save_state(self):
+        scan_state = {
+            'lexeme': self.lexeme,
+            't_label' : self.token_class,
+            'col_num' : self.col_num,
+            'line_num' : self.line_num,
+            'current_line' : self.current_line,
+            'next_char' : self.next_char,
+            'next_char_class' : self.next_char_class}
+        return scan_state
+    # end save_state()
+
+    def load_state(self, state: dict):
+        self.lexeme = state['lexeme']
+        self.token_class = state['t_label']
+        self.col_num = state['col_num']
+        self.line_num = state['line_num']
+        self.current_line = state['current_line']
+        self.next_char = state['next_char']
+        self.next_char_class = state['next_char_class']
+    # end load_state
+        
     def print_list(self):
         """
         """
