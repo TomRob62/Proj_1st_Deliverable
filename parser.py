@@ -33,7 +33,7 @@ class My_Parser:
         return self.token
     # end next_token()
 
-    def print_error(self, message) -> None:
+    def print_error(self, message: str) -> None:
         """
         Helper function that prints an error message.
         """
@@ -46,14 +46,19 @@ class My_Parser:
         exit()
     # end print_error()
 
-    def backtrack(self, num_remove = 1):
+    def backtrack(self, num_remove:int  = 1) -> None:
+        "Helper function that backtracks a specific number of tokens"
         for i in range(num_remove):
             self.my_scan.load_state(self.token_stack.pop())
             self.token = self.my_scan.token_class
     # end backtrack()
 
-    def main(self):
-        while self.my_scan.next_char_class != 3:
+    def main(self) -> None:
+        """
+        Main driver function. Will request tokens until end of file
+        is reached.
+        """
+        while self.my_scan.next_char_class != 3: # 3 is end-of-file
             self.var_decls()
             self.method_decls()
             self.next_token()
@@ -61,19 +66,32 @@ class My_Parser:
             print("Success!")
     # end main()
 
+    """
+    From this point on, the functions are representative of the grammar. 
+    Each function (procedure) are mutually recursive.
+    """
     def method_decls(self):
+        """
+        Rule: MethodDecls = { MethodDecl } .
+
+        allows zero or more method declarations.
+        """
         while self.method_decl():
             self.next_token()
     # end method_decls()
 
     def method_decl(self):
-        if self.token == "T_VOID" or self.type():
-            if self.next_token() == "T_IDENTIFIER":
-                if self.next_token() == "T_LPAREN":
+        """
+        Rule: MethodDecl  = MethodType identifier "(" [ { identifier Type }+, ] ")" Block
+        """
+        if self.token == "T_VOID" or self.type(): #  Type
+            if self.next_token() == "T_IDENTIFIER": # identifier
+                if self.next_token() == "T_LPAREN": # "("
                     self.paren_stack += 1
                     self.next_token()
-                    while self.type():
-                        if self.next_token() == "T_IDENTIFIER":
+                    # zero or more method arguments
+                    while self.type(): # Type
+                        if self.next_token() == "T_IDENTIFIER": # identifier
                             if self.next_token() == "T_COMMA":
                                 self.next_token()
                             elif self.token == "T_RPAREN":
@@ -87,17 +105,20 @@ class My_Parser:
                             self.paren_stack -= 1
                             self.next_token()
                             return self.block()
-            self.backtrack()
+            self.backtrack() # back tracking
             return False
         else:
             return False
     # end method _decl()
 
     def block(self):
+        """
+        Rule: Block = "{" VarDecls Statements "}" .
+        """
         if self.token == "T_LCB":
             self.next_token()
-            self.var_decls()
-            self.statements()
+            self.var_decls() # VarDecls
+            self.statements() # Statements
             if self.token == "T_RCB":
                 return True
             self.print_error("Syntax Error: expected right bracket")
@@ -106,16 +127,26 @@ class My_Parser:
     # end block()
 
     def var_decls(self):
+        """
+        Rule: VarDecls = { VarDecl } .
+
+        zero or more variable declarations
+        """
         while self.var_decl():
             self.next_token()
     # end var_decls()
 
     def var_decl(self):
-        if self.type():
-            if self.next_token() == "T_IDENTIFIER":
-                if self.next_token() == "T_SEMICOLON":
+        """
+        Rule: VarDecl  = Type identifier  ";" .
+
+        Only allows 1 variable declaration at a time.
+        """
+        if self.type(): # Type 
+            if self.next_token() == "T_IDENTIFIER": # identifier
+                if self.next_token() == "T_SEMICOLON": # ";"
                     return True
-                self.backtrack(2)
+                self.backtrack(2) # back tracking
                 return False
             else:
                 self.print_error("Syntax Error: expected identifier")
@@ -124,15 +155,23 @@ class My_Parser:
     # end var_decl()
 
     def statements(self):
+        """
+        Rule: Statements = { Statement } .
+
+        zero or more statements
+        """
         while self.statement():
             self.next_token()
     # end statements
 
     def assign(self):
-        if self.token == "T_IDENTIFIER":
-            if self.next_token() == "T_ASSIGN":
+        """
+        Rule: Assign    = identifier "=" Expr .
+        """
+        if self.token == "T_IDENTIFIER": # identifier
+            if self.next_token() == "T_ASSIGN": # "="
                 self.next_token()
-                return self.expr()
+                return self.expr() # Expr
             self.backtrack()
             return False
         else:
@@ -140,20 +179,25 @@ class My_Parser:
     # end assign()
 
     def method_call(self):
-        if self.token == "T_IDENTIFIER":
-            if self.next_token() == "T_LPAREN":
+        """
+        Rule: MethodCall = identifier "(" [ { MethodArg }+, ] ")" .
+        """
+        if self.token == "T_IDENTIFIER": # identifer
+            if self.next_token() == "T_LPAREN": # "("
                 self.paren_stack += 1
                 if self.next_token() == "T_RPAREN":
                     return True
                 else:
+                    # zero or more Method Arg
+                    # MethodArg  = Expr | Constant.
                     while self.token != "T_RPAREN":
-                        if self.constant():
+                        if self.constant(): # Constant
                             self.next_token()
-                        elif self.expr():
+                        elif self.expr(): # Expr
                             self.next_token()
-                        if self.token == "T_COMMA":
+                        if self.token == "T_COMMA": # ","
                             self.next_token()
-                        elif self.token == "T_RPAREN":
+                        elif self.token == "T_RPAREN": # ")"
                             self.paren_stack -= 1
                         else:
                             break
@@ -166,17 +210,35 @@ class My_Parser:
     # end method_call()
     
     def statement(self):
-        if self.block():
+        """
+        Rule: Statement = Block 
+                        | Assign ";" 
+                        | MethodCall ";" 
+                        | if "(" Expr ")" Block [ else Block ] 
+                        | while "(" Expr ")" Block 
+                        | for "(" { Assign }+, ";" Expr ";" { Assign }+, ")" Block 
+                        | return [ "(" [ Expr ] ")" ] ";" 
+                        | break ";" 
+                        | continue ";" 
+        """
+        # Block
+        if self.block(): 
             return True
-        elif self.assign():
+        
+        # Assign ";"
+        elif self.assign(): 
             if self.next_token() == "T_SEMICOLON":
                 return True
             self.print_error("Syntax Error: expected semicolon")
-        elif self.method_call():
+
+        # MethodCall ";"
+        elif self.method_call(): 
             if self.next_token() == "T_SEMICOLON"  or self.paren_stack:
                 return True
             self.print_error("Syntax Error: expected semicolon")
-        elif self.token == "T_IF":
+
+        # if "(" Expr ")" Block [ else Block ] 
+        elif self.token == "T_IF": 
             if self.next_token() == "T_LPAREN":
                 self.next_token()
                 if self.expr():
@@ -191,7 +253,9 @@ class My_Parser:
                     self.print_error("Syntax Error: expected expression")
             else:
                 self.print_error("Syntax Error: expected left parenthesis")
-        elif self.token == "T_FOR":
+        
+        # for "(" { Assign }+, ";" Expr ";" { Assign }+, ")" Block 
+        elif self.token == "T_FOR": 
             if self.next_token() == "T_LPAREN":
                 self.next_token()
                 if self.assign():
@@ -219,7 +283,9 @@ class My_Parser:
                     self.print_error("Syntax Error: expected assignment statement")
             else:
                 self.print_error("Syntax Error: expected left parenthesis")
-        elif self.token == "T_WHILE":
+
+        # while "(" Expr ")" Block 
+        elif self.token == "T_WHILE":  
             if self.next_token() == "T_LPAREN":
                 self.next_token()
                 self.expr()
@@ -227,6 +293,8 @@ class My_Parser:
                     self.block()
                     return True
             self.print_error("Syntax Error: statement()")
+
+        # return [ "(" [ Expr ] ")" ] ";" 
         elif self.token == "T_RETURN":
             if self.next_token() == "T_SEMICOLON":
                 return True
@@ -241,11 +309,15 @@ class My_Parser:
                         self.print_error("Syntax Error: expectedd right parenthesis")
                 if self.next_token() == "T_SEMICOLON":
                     return True
+                
+        # break ";" 
         elif self.token == "T_BREAK":
             if self.next_token() == "T_SEMICOLON":
                 return True
             else:
                 self.print_error("Syntax Error: statement()")
+
+        # continue ";"
         elif self.token == "T_CONTINUE":
             if self.next_token() == "T_SEMICOLON":
                 return True
@@ -253,17 +325,26 @@ class My_Parser:
                 self.print_error("Syntax Error: statement()")
         else:
             return False
+    # end statement()
 
     def unary_op(self):
+        """
+        Rule: UnaryOperator = ( UnaryNot | UnaryMinus ) .
+        """
         return self.token == "T_NOT" or self.token == "T_MINUS"
     # end unary_op()
 
     def bin_op(self):
+        """
+        Rule: BinaryOperator = ( ArithmeticOperator | BooleanOperator ) .
+        """
         return self.arith_op() or self.bool_op()  
     # end bin_op  
 
     def arith_op(self):
-        """( "+" | "-" | "*" | "/" | "<<" | ">>" | "%" )"""
+        """
+        Rule: ArithmentOperator = ( "+" | "-" | "*" | "/" | "<<" | ">>" | "%" )
+        """
         return (self.token == "T_PLUS"
                 or self.token == "T_MINUS"
                 or self.token == "T_MULT"
@@ -274,7 +355,9 @@ class My_Parser:
     # end arith_op()
 
     def bool_op(self):
-        """BooleanOperator = ( "==" | "!=" | "<" | "<=" | ">" | ">=" | "&&" | "||" ) """
+        """
+        Rule: BooleanOperator = ( "==" | "!=" | "<" | "<=" | ">" | ">=" | "&&" | "||" ) 
+        """
         return (self.token == "T_EQ"
                 or self.token == "T_NEQ"
                 or self.token == "T_LT"
@@ -286,6 +369,13 @@ class My_Parser:
     # end bool_op()
 
     def expr(self):
+        """
+        Rule Expr =   Constant
+                    | UnaryOperator Expr
+                    | MethodCall
+                    | Expr BinaryOperator Expr
+                    | identifier
+        """
         if self.constant(): # constant
             return True
         elif self.unary_op(): # unary operator
@@ -306,11 +396,19 @@ class My_Parser:
                     self.print_error("Syntax Error: expr()")
             else:
                 self.backtrack()
-            return True
+            return True # identifier
         else:
             return False
     # end expr()
+
     def type(self):
+        """
+        Rule: Type = int
+                    | string
+                    | char
+                    | bool
+                    | float
+        """
         return (self.token == "T_INTTYPE"
                 or self.token == "T_STRINGTYPE"
                 or self.token == "T_CHARTYPE"
@@ -319,16 +417,26 @@ class My_Parser:
     # end type()
 
     def method_type(self):
+        """
+        Rule: MethodType = void
+                            | Type
+        """
         return (self.token == "T_VOID"
                 or self.type())
     # end method_type()
 
     def bool_constant(self):
+        """
+        Rule: BoolConstant = ( true | false )
+        """
         return (self.token == "T_BoolConstant (value= true)"
                 or self.token == "T_BoolConstant (value= false)")
     # end bool_constant()
 
     def array_type(self):
+        """
+        Rule: ArrayType = "[" int_lit "]" Type .
+        """
         if self.token == "T_LSB":
             if self.next_token() == "T_INTCONSTANT":
                 if self.next_token() == "T_RSB":
@@ -340,8 +448,15 @@ class My_Parser:
     # end array_type()
 
     def constant(self):
+        """
+        Rule: Constant = int_lit
+                        | string_lit
+                        | char_lit
+                        | BoolConstant
+        """
         return (self.token == "T_INTCONSTANT"
             or self.token == "T_STRINGCONSTANT"
             or self.token == "T_CHARCONSTANT"
             or self.bool_constant())
     # end constant
+# end My_Parser
